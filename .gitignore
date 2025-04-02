@@ -1,0 +1,9 @@
+.terraform
+.terraform.lock.hcl
+*.env
+data/competitions
+data/events
+data/lineups
+data/matches
+data/three-sixty
+service-account.json
