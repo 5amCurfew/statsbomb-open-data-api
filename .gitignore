@@ -6,4 +6,5 @@ data/events
 data/lineups
 data/matches
 data/three-sixty
+node_modules
 service-account.json

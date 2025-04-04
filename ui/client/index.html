@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Soccer App</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Panel 1: Select Competition -->
+    <div class="panel">
+      <h3>Competition</h3>
+      <select id="competitionSelect">
+        <option value="">Loading competitions...</option>
+      </select>
+    </div>
+
+    <!-- Panel 2: Select Match -->
+    <div class="panel">
+      <h3>Match</h3>
+      <select id="matchSelect">
+        <option value="">Select</option>
+      </select>
+    </div>
+
+    <!-- Panel 3: Lineups -->
+    <div class="panel">
+      <h3>Lineups</h3>
+      <div id="lineups">Please select a match to view lineups.</div>
+    </div>
+
+    <!-- Panel 4: Events -->
+    <div class="panel">
+      <h3>Events</h3>
+      <div id="events">Please select a match to choose events.</div>
+    </div>
+
+  </div>
+
+  <script type="module" src="/script.js"></script>
+</body>
+</html>
