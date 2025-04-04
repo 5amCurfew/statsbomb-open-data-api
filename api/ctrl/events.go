@@ -8,11 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetLineUps(c *gin.Context) {
+func GetEvents(c *gin.Context) {
 	if c.Param("match_id") == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "match id is required"})
 		return
 	}
 
-	lib.GCPStorage(c, fmt.Sprintf("lineups/%s.json", c.Param("match_id")))
+	lib.GCPStorage(c, fmt.Sprintf("events/%s.json", c.Param("match_id")))
 }
