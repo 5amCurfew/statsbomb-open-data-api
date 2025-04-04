@@ -1,13 +1,3 @@
-data "google_iam_policy" "service_account_user" {
-  binding {
-    role = "roles/iam.serviceAccountUser"
-
-    members = [
-      "user:samueltobyknight@gmail.com",
-    ]
-  }
-}
-
 resource "google_service_account" "service_account_admin" {
   account_id    = "sa-admin"
   display_name  = "Admin SA"
@@ -25,7 +15,10 @@ resource "google_service_account" "service_account_reader" {
   description   = "Service Account with Reader policy"
 }
 
-resource "google_service_account_iam_policy" "reader_account_iam" {
-  service_account_id = google_service_account.service_account_reader.name
-  policy_data        = data.google_iam_policy.reader.policy_data
+resource "google_storage_bucket_iam_binding" "storage_object_data_reader_binding" {
+  bucket = google_storage_bucket.data.name
+  role = "roles/storage.objectViewer"
+  members = [
+    "serviceAccount:${google_service_account.service_account_reader.email}"
+  ]
 }

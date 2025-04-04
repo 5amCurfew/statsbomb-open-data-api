@@ -32,23 +32,9 @@ data "google_iam_policy" "admin" {
         "serviceAccount:${google_service_account.service_account_admin.email}"
     ]
   }
-}
-
-data "google_iam_policy" "reader" {
-  binding {
-    role = "roles/reader"
-
-    members = [
-      "serviceAccount:${google_service_account.service_account_reader.email}"
-    ]
-  }
 
   binding {
-    role = "roles/storage.objectViewer"
-
-    members = [
-      "serviceAccount:${google_service_account.service_account_reader.email}"
-    ]
+    role = "roles/iam.serviceAccountUser"
+    members = ["user:samueltobyknight@gmail.com"]
   }
-
 }
