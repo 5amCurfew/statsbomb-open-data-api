@@ -17,12 +17,11 @@ const (
 )
 
 func GCPStorage(c *gin.Context, path string) {
-	// Build the GCS file path (no ".json" extension is added here, it's assumed the path already includes the file extension)
 	filePath := path
 
 	// Create a GCS client
 	ctx := context.Background()
-	client, err := storage.NewClient(ctx, option.WithCredentialsFile("service-account.json")) // Provide your service account JSON file
+	client, err := storage.NewClient(ctx, option.WithCredentialsFile("service-account.json"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to create GCS client: %v", err)})
 		return

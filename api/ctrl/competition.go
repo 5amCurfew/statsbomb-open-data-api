@@ -18,5 +18,5 @@ func GetCompetition(c *gin.Context) {
 		return
 	}
 
-	lib.Local(c, fmt.Sprintf("competitions/%s_%s.json", c.Param("competition_id"), c.Param("season_id")))
+	lib.GCPStorage(c, fmt.Sprintf("competitions/%s_%s.json", c.Param("competition_id"), c.Param("season_id")))
 }
