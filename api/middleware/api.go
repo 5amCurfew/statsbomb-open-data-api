@@ -5,16 +5,18 @@ import (
 	"os"
 	"strings"
 
+	"cloud.google.com/go/storage"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
-func Api() gin.HandlerFunc {
+func Api(gcsClient *storage.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := extractTokenFromRequest(c)
 		token, _ := parseToken(tokenString)
 
 		if token.Valid {
+			c.Set("gcsClient", gcsClient)
 			c.Next()
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized token"})

@@ -9,7 +9,6 @@ import (
 
 	"cloud.google.com/go/storage"
 	"github.com/gin-gonic/gin"
-	"google.golang.org/api/option"
 )
 
 const (
@@ -18,18 +17,11 @@ const (
 
 func GCPStorage(c *gin.Context, path string) {
 	filePath := path
-
-	// Create a GCS client
-	ctx := context.Background()
-	client, err := storage.NewClient(ctx, option.WithCredentialsFile("service-account.json"))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to create GCS client: %v", err)})
-		return
-	}
-	defer client.Close()
+	gcsClient, _ := c.Get("gcsClient")
+	client, _ := gcsClient.(*storage.Client)
 
 	// Read the file from GCS
-	rc, err := client.Bucket(bucketName).Object(filePath).NewReader(ctx)
+	rc, err := client.Bucket(bucketName).Object(filePath).NewReader(context.Background())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to read file from GCS: %v", err)})
 		return
