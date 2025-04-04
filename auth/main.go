@@ -43,5 +43,5 @@ func main() {
 	admin.GET("/user/:identifier", ctrl.GetUser)
 	admin.GET("/token/:token", ctrl.GetToken)
 
-	r.Run(":8080")
+	r.Run(":4000")
 }

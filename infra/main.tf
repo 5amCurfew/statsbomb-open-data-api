@@ -42,4 +42,13 @@ data "google_iam_policy" "reader" {
       "serviceAccount:${google_service_account.service_account_reader.email}"
     ]
   }
+
+  binding {
+    role = "roles/storage.objectViewer"
+
+    members = [
+      "serviceAccount:${google_service_account.service_account_reader.email}"
+    ]
+  }
+
 }
