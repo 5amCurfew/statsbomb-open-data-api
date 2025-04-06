@@ -7,38 +7,40 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <div class="container">
-    
-    <!-- Panel 1: Select Competition -->
-    <div class="panel">
-      <h3>Competition</h3>
+  <!-- Top Banner: Competition + Match -->
+  <div class="top-bar">
+    <div class="select-group">
+      <label for="competitionSelect">Competition</label>
       <select id="competitionSelect">
         <option value="">Loading competitions...</option>
       </select>
     </div>
-
-    <!-- Panel 2: Select Match -->
-    <div class="panel">
-      <h3>Match</h3>
+    <div class="select-group">
+      <label for="matchSelect">Match</label>
       <select id="matchSelect">
         <option value="">Select</option>
       </select>
     </div>
-
-    <!-- Panel 3: Lineups -->
-    <div class="panel">
-      <h3>Lineups</h3>
-      <div id="lineups">Please select a match to view lineups.</div>
-    </div>
-
-    <!-- Panel 4: Events -->
-    <div class="panel">
-      <h3>Events</h3>
-      <div id="events">Please select a match to choose events.</div>
-    </div>
-
+    <div id="matchDetails" class="match-details"></div>
   </div>
 
-  <script type="module" src="/script.js"></script>
+  <!-- Main Panels -->
+  <div class="container">
+    <!-- Lineups -->
+    <div class="panel">
+      <div id="lineUpPanel"></div>
+    </div>
+
+    <!-- Events -->
+    <div class="panel">
+      <h3>Events</h3>
+      <div id="events">Please select a match to choose events</div>
+    </div>
+  </div>
+
+  <script type="module" src="/competitions.js"></script>
+  <script type="module" src="/lineups.js"></script>
+  <script type="module" src="/matches.js"></script>
 </body>
+
 </html>
