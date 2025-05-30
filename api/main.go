@@ -41,9 +41,10 @@ func main() {
 	api.Use(middleware.Api(client))
 	api.GET("/competitions/", ctrl.GetCompetitions)
 	api.GET("/competition/:competition_id/:season_id", ctrl.GetCompetition)
-	//api.GET("/events/:match_id", ctrl.GetEvents)
+	api.GET("/events/:match_id", ctrl.GetEvents)
 	api.GET("/lineups/:match_id", ctrl.GetLineUps)
 	api.GET("/matches/:competition_id/:season_id", ctrl.GetMatches)
+	api.GET("/threesixty/:match_id", ctrl.GetThreeSixties)
 
 	r.Run(":8080")
 }
