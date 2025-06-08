@@ -8,17 +8,11 @@ import (
 	"github.com/5amCurfew/statsbomb-open-data/api/ctrl"
 	"github.com/5amCurfew/statsbomb-open-data/api/middleware"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/api/option"
 )
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic("error parsing .env")
-	}
-
 	log.SetFormatter(&log.JSONFormatter{})
 
 	r := gin.Default()

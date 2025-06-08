@@ -34,8 +34,8 @@ async function fetchNewToken() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                email: process.env.API_EMAIL,
-                password: process.env.API_PASS
+                email: process.env.API_USER_EMAIL,
+                password: process.env.API_USER_PASS
             })
         });
 

@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	"os"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
@@ -16,27 +17,30 @@ var DB *gorm.DB
 func ConnectToAuthDatabase() {
 	var err error
 
-	host := os.Getenv("DB_HOST")
-	name := os.Getenv("DB_NAME")
-	port := os.Getenv("DB_PORT")
-	pass := os.Getenv("DB_PASS")
-
-	log.Infof("Connecting to %s:%s/%s", host, name, port)
+	host := os.Getenv("AUTH_DB_HOST")
+	name := os.Getenv("AUTH_DB_NAME")
+	pass := os.Getenv("AUTH_DB_PASS")
+	port := os.Getenv("AUTH_DB_PORT")
+	user := os.Getenv("AUTH_DB_USER")
 
 	dsn := fmt.Sprintf(
-		"host=%s user=postgres password=%s dbname=%s port=%s sslmode=disable application_name=auth",
-		host,
-		pass,
-		name,
-		port,
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		host, user, pass, name, port,
 	)
 
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	maxAttempts := 10
+	for attempts := 1; attempts <= maxAttempts; attempts++ {
+		log.Infof("connecting to DB (%s:%s/%s), attempt %d/%d", host, port, name, attempts, maxAttempts)
+		DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		if err == nil {
+			log.Infof("successfully connected to %s:%s/%s", host, port, name)
+			return
+		}
 
-	if err != nil {
-		log.Fatalln(fmt.Sprintf("failed to connect to %s:%s/%s: %s", host, port, name, err))
-	} else {
-		log.Infof("%s:%s/%s connection successful", host, port, name)
+		log.Warnf("database connection failed: %v", err)
+
+		time.Sleep(1 * time.Second) // wait before retry
 	}
 
+	log.Fatalf("could not connect to database after %d attempts: %v", maxAttempts, err)
 }

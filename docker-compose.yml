@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: statsbomb-open-data-auth-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_PASSWORD: ${AUTH_DB_PASS}
+      POSTGRES_USER: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+          test: ["CMD", "pg_isready", "-U", "postgres"]
+          interval: 5s
+          timeout: 3s
+          retries: 5
+
+  auth:
+    build:
+      context: ./auth
+    container_name: statsbomb-open-data-auth
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    environment:
+      API_SECRET: ${API_SECRET}
+      AUTH_DB_HOST: postgres
+      AUTH_DB_NAME: auth_db
+      AUTH_DB_PASS: ${AUTH_DB_PASS}
+      AUTH_DB_PORT: 5432
+      AUTH_DB_USER: postgres
+      TOKEN_HOUR_LIFESPAN: 3
+
+  api:
+    build:
+      context: ./api
+    container_name: statsbomb-open-data-api
+    ports:
+      - "8080:8080"
+    environment:
+      API_SECRET: ${API_SECRET}
+  
+volumes:
+  pgdata:

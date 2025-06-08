@@ -8,16 +8,11 @@ import (
 	"github.com/5amCurfew/statsbomb-open-data-api/auth/middleware"
 	"github.com/5amCurfew/statsbomb-open-data-api/auth/models"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
 	log.SetFormatter(&log.JSONFormatter{})
-	err := godotenv.Load(".env")
-	if err != nil {
-		panic("error parsing .env")
-	}
 
 	lib.ConnectToAuthDatabase()
 	lib.DB.AutoMigrate(&models.User{})
