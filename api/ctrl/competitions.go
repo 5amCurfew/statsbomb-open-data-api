@@ -19,7 +19,7 @@ func GetCompetitions(c *gin.Context) {
 	client, _ := gcsClient.(*storage.Client)
 
 	// Read from GCS
-	data, err := lib.ReadGCSFile("competitions/all.json", client)
+	data, err := lib.ReadGCSFile("competitions/competitions.json", client)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

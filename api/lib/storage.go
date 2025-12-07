@@ -15,7 +15,7 @@ const (
 func ReadGCSFile(path string, client *storage.Client) ([]byte, error) {
 	rc, err := client.Bucket(bucketName).Object(path).NewReader(context.Background())
 	if err != nil {
-		return nil, fmt.Errorf("failed to read file from GCS: %w", err)
+		return nil, fmt.Errorf("failed to read file from GCS: %s %w", path, err)
 	}
 	defer rc.Close()
 
