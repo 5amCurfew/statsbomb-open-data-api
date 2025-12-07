@@ -84,89 +84,142 @@ function createLineUpPitch(svg, width, height) {
         .attr('stroke', 'black').attr('fill', 'none');
 }
 
-// Create lineup players (row-based)
+// Position ID mappings to pitch coordinates (x: 0-80, y: 0-120 scale, centered at x=40)
+const positionMappings = {
+    1: { x: 40, y: 10 }, // Goalkeeper
+    // Defenders (y=24)
+    2: { x: 60, y: 24 },   // Right Back
+    3: { x: 52, y: 24 },   // Right Center Back
+    4: { x: 40, y: 24 },   // Center Back
+    5: { x: 28, y: 24 },   // Left Center Back
+    6: { x: 20, y: 24 },   // Left Back
+    7: { x: 64, y: 26 },   // Right Wing Back
+    8: { x: 16, y: 26 },   // Left Wing Back
+    // Defensive Midfielders (y=42)
+    9: { x: 52, y: 42 },   // Right Defensive Midfield
+    10: { x: 40, y: 42 },  // Center Defensive Midfield
+    11: { x: 28, y: 42 },  // Left Defensive Midfield
+    // Midfielders (y=60)
+    12: { x: 60, y: 60 },  // Right Midfield
+    13: { x: 52, y: 60 },  // Right Center Midfield
+    14: { x: 40, y: 60 },  // Center Midfield
+    15: { x: 28, y: 60 },  // Left Center Midfield
+    16: { x: 20, y: 60 },  // Left Midfield
+    // Attacking Midfielders (y=78)
+    18: { x: 60, y: 78 },  // Right Attacking Midfield
+    19: { x: 52, y: 78 },  // Right Midfield/Attacking Midfield
+    20: { x: 28, y: 78 },  // Left Attacking Midfield
+    // Forwards/Wingers (y=96)
+    17: { x: 64, y: 96 },  // Right Wing
+    21: { x: 16, y: 96 },  // Left Wing
+    22: { x: 48, y: 96 },  // Right Center Forward
+    23: { x: 40, y: 106 }, // Center Forward
+    24: { x: 32, y: 96 },  // Left Center Forward
+    25: { x: 40, y: 84 }   // Secondary Striker
+};
+
+// Create lineup players positioned on the pitch
 function createLineUpPlayers(svg, data, width, height) {
     const pitchWidth = width * 0.9;
     const pitchHeight = height;
     const pitchOffsetX = (width - pitchWidth) / 2;
+    const pitchOffsetY = 0;
 
-    const rowY = {
-        GK: 5,
-        DEF: 25,
-        MID: 50,
-        FWD: 75
-    };
+    // Create scales matching the pitch (x: 0-80, y: 0-120)
+    const xScale = d3.scaleLinear()
+        .domain([0, 80])
+        .range([pitchOffsetX, pitchOffsetX + pitchWidth]);
 
-    const teams = data.map(team => ({
+    const yScale = d3.scaleLinear()
+        .domain([0, 120])
+        .range([pitchOffsetY, pitchHeight]);
+
+    // Teams: index 0 is at top (home), index 1 is at bottom (away)
+    const teams = data.map((team, idx) => ({
         name: team.team_name,
+        teamId: team.team_id,
+        isHome: idx === 0,
         players: team.lineup
             .map(p => {
-                // Find the starting XI position - must be at from: "00:00"
+                // Find the starting XI position
                 const starting = p.positions.find(pos => 
                     pos.start_reason === "Starting XI"
                 );
                 if (!starting) return null; // not a starter
 
-                // Determine row for plotting
-                let row;
-                if ([1].includes(starting.position_id)) row = "GK";
-                else if ([2,3,4,5,6].includes(starting.position_id)) row = "DEF";
-                else if ([12,13,14,15,16].includes(starting.position_id)) row = "MID";
-                else if ([17,21,22,23,24,25].includes(starting.position_id)) row = "FWD";
-                else row = "MID";
+                const posId = starting.position_id;
+                const mapping = positionMappings[posId] || { x: 40, y: 60 };
 
                 return {
                     id: p.player_id,
                     name: p.player_name,
                     number: p.jersey_number,
-                    posId: starting.position_id,
-                    row
+                    posId: posId,
+                    posName: starting.position,
+                    x: mapping.x,
+                    y: mapping.y
                 };
             })
-            .filter(Boolean) // remove non-starters
+            .filter(Boolean)
     }));
 
-    teams[0].side = "top";
-    teams[1].side = "bottom";
-
     teams.forEach((team, ti) => {
-        const teamPlayers = team.players;
-        const yScale = d3.scaleLinear()
-            .domain([0, 100])
-            .range(ti === 0 ? [0, pitchHeight / 2] : [pitchHeight / 2, pitchHeight]);
+        const isHome = ti === 0;
+        const color = isHome ? "#1f77b4" : "#ff7f0e";
 
-        const rowGroups = {};
-        ["GK","DEF","MID","FWD"].forEach(r => {
-            rowGroups[r] = teamPlayers.filter(p => p.row === r);
+        // Group players by position to add jitter
+        const positionGroups = {};
+        team.players.forEach(p => {
+            const key = `${p.x},${p.y}`;
+            if (!positionGroups[key]) {
+                positionGroups[key] = [];
+            }
+            positionGroups[key].push(p);
         });
 
-        Object.entries(rowGroups).forEach(([rowName, rowPlayers]) => {
-            const n = rowPlayers.length;
-            rowPlayers.forEach((p, i) => {
-                const x = pitchOffsetX + pitchWidth * (i + 1) / (n + 1);
-                const y = yScale(rowY[rowName]);
+        // Apply jitter to players at same position
+        team.players.forEach((p, idx) => {
+            const key = `${p.x},${p.y}`;
+            const playersAtPosition = positionGroups[key];
+            
+            // Add jitter based on position in group (radius from center)
+            const jitterRadius = 3;
+            const angle = (idx / playersAtPosition.length) * Math.PI * 2;
+            const jitterX = Math.cos(angle) * jitterRadius;
+            const jitterY = Math.sin(angle) * jitterRadius;
 
-                // Player circle
-                svg.append("circle")
-                    .attr("class", "player")
-                    .attr("cx", x)
-                    .attr("cy", y)
-                    .attr("r", 16)
-                    .attr("fill", ti === 0 ? "#1f77b4" : "#ff7f0e")
-                    .attr("stroke", "white")
-                    .attr("stroke-width", 2);
+            const svgX = xScale(p.x + jitterX);
+            let svgY;
 
-                // Jersey number
-                svg.append("text")
-                    .attr("x", x)
-                    .attr("y", y + 5)
-                    .attr("text-anchor", "middle")
-                    .attr("dominant-baseline", "middle")
-                    .attr("fill", "white")
-                    .attr("font-size", "11px")
-                    .attr("font-weight", "bold")
-                    .text(p.number);
-            });
+            if (isHome) {
+                // Home team at top half, facing down (0-60 maps to top half)
+                svgY = yScale((p.y + jitterY) / 2);
+            } else {
+                // Away team at bottom half, facing up (flip their y: maps to bottom half)
+                svgY = yScale(60 + (60 - (p.y + jitterY)) / 2);
+            }
+
+            // Player circle
+            svg.append("circle")
+                .attr("class", "player")
+                .attr("cx", svgX)
+                .attr("cy", svgY)
+                .attr("r", 16)
+                .attr("fill", color)
+                .attr("stroke", "white")
+                .attr("stroke-width", 2)
+                .attr("title", `${p.name} (#${p.number}) - ${p.posName}`);
+
+            // Jersey number
+            svg.append("text")
+                .attr("x", svgX)
+                .attr("y", svgY + 5)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .attr("fill", "white")
+                .attr("font-size", "11px")
+                .attr("font-weight", "bold")
+                .text(p.number);
         });
     });
 }
