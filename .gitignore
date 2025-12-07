@@ -9,3 +9,4 @@ data/matches
 data/three-sixty
 node_modules
 service-account.json
+test_*
