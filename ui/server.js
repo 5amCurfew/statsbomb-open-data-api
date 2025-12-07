@@ -11,12 +11,15 @@ dotenv.config();
 
 const app = express();
 const PORT = 3000;
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+// __dirname equivalent in ES modules
+const __dirname = path.resolve();
 
-app.use(express.static(path.join(__dirname, '../client')));
+const API_URL = process.env.API_URL
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/index.html'));
+app.use(express.static(path.join(__dirname, "client")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "index.html"));
 });
 
 app.use(cors({
@@ -33,7 +36,7 @@ app.get('/api/competitions', async (req, res) => {
             });
         }
 
-        const response = await fetch('http://localhost:8080/api/competitions', {
+        const response = await fetch(`${API_URL}/api/competitions`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -67,7 +70,7 @@ app.get('/api/matches', async (req, res) => {
 
     try {
         const token = await getAuthToken();
-        const apiRes = await fetch(`http://localhost:8080/api/matches/${competition_id}/${season_id}`, {
+        const apiRes = await fetch(`${API_URL}/api/matches/${competition_id}/${season_id}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -101,7 +104,7 @@ app.get('/api/lineups', async (req, res) => {
 
     try {
         const token = await getAuthToken();
-        const apiRes = await fetch(`http://localhost:8080/api/lineups/${match_id}`, {
+        const apiRes = await fetch(`${API_URL}/api/lineups/${match_id}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

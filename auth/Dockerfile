@@ -14,4 +14,4 @@ EXPOSE 8080
 
 CMD ["/app/main"]
 # docker build -t statsbomb-open-data-api/auth .
-# docker run -p 80:8080 statsbomb-open-data-api/auth
+# docker run -p 8080:8080 statsbomb-open-data-api/auth

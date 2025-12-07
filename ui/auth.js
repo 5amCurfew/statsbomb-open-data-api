@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-const API_LOGIN_URL = 'http://localhost:4000/auth/login';
+const AUTH_LOGIN_URL = process.env.AUTH_URL + '/auth/login';
 
 // Simple in-memory cache
 let cachedToken = null;
@@ -28,7 +28,7 @@ export async function getAuthToken() {
 
 async function fetchNewToken() {
     try {
-        const response = await fetch(API_LOGIN_URL, {
+        const response = await fetch(AUTH_LOGIN_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
